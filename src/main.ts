@@ -1,4 +1,4 @@
-import { Actor, Collider, CollisionType, Color, Engine, ExitViewPortEvent, Font, Text, vec } from "excalibur"
+import { Actor, Collider, CollisionType, Color, Engine, ExitViewPortEvent, Font, FontUnit, Label, Sound, Text, vec } from "excalibur"
 import { vector } from "excalibur/build/dist/Util/DrawUtil"
 
 // 1 - criar uma instancia de Engine, que representa o jogo.
@@ -40,27 +40,27 @@ const bolinha = new Actor({
 	color: Color.Red
 })
 
-let ponto = 0
+// let ponto = 0
 
-const txtponto = new Text ({
-	text: "hello world",
-	font: new Font({size: 30})
-})
+// const txtponto = new Text ({
+// 	text: "hello world",
+// 	font: new Font({size: 30})
+// })
 
-const objtxt = new Actor({
-	x: game.drawWidth - 80,
-	y: game.drawHeight - 15
-})
+// const objtxt = new Actor({
+// 	x: game.drawWidth - 80,
+// 	y: game.drawHeight - 15
+// })
 
-objtxt.graphics.use(txtponto)
+// objtxt.graphics.use(txtponto)
 
-game.add(objtxt)
+// game.add(objtxt)
 
 bolinha.body.collisionType = CollisionType.Passive
 
 // 5 - criar movimentação bolinha
 
-const velocidade = vec(950, 950)
+const velocidade = vec(750, 750)
 
 setTimeout(() => {
 	bolinha.vel = velocidade
@@ -132,11 +132,44 @@ listaBlocos.forEach(bloco => {
 	game.add(bloco)
 })
 
+let pontos = 0
+
+const txtpontos = new Label({
+	text: pontos.toString(),
+	font: new Font({
+		size: 40,
+		color:Color.White,
+		strokeColor: Color.Black,
+		unit: FontUnit.Px
+	}),
+	pos: vec(750, 550)
+
+})
+
+game.add(txtpontos)
+
 let colidindo: boolean = false
+
+const audio = new Audio('audio.mp3')
+const audio3 = new Audio('Win.mp3')
 
 bolinha.on("collisionstart", (event) => {
 	if (listaBlocos.includes(event.other)){
 		event.other.kill()
+
+		pontos++
+
+		if (pontos == 15){
+
+			audio3.play()
+
+			alert("Você venceu!")
+			window.location.reload()
+		}
+
+		audio.play()
+		
+		txtpontos.text = pontos.toString()
 	}
 
 let intersec = event.contact.mtv.normalize()
@@ -158,11 +191,17 @@ bolinha.on("collisionend", () =>{
 	colidindo = false
 })
 
+const audio2 = new Audio('gameover.mp3')
+
 bolinha.on("exitviewport", () => {
+	audio2.play()
+
 	alert("E morreu")
 
 	window.location.reload()
 })
+
+
 
 // inicia o game
 game.start()
