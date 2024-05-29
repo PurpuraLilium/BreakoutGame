@@ -1,4 +1,4 @@
-import { Actor, Collider, CollisionType, Color, Engine, ExitViewPortEvent, Font, FontUnit, Label, Sound, Text, vec } from "excalibur"
+import { Actor, Collider, CollisionType, Color, Engine, ExitViewPortEvent, Font, FontUnit, Label, Loader, Sound, Text, vec } from "excalibur"
 import { vector } from "excalibur/build/dist/Util/DrawUtil"
 
 // 1 - criar uma instancia de Engine, que representa o jogo.
@@ -57,6 +57,21 @@ const bolinha = new Actor({
 // game.add(objtxt)
 
 bolinha.body.collisionType = CollisionType.Passive
+
+// let corBolinha = [
+// 	Color.Black, 
+// 	Color.Chartreuse, 
+// 	Color.Cyan,
+// 	Color.Green,
+// 	Color.Magenta,
+// 	Color.Orange,
+// 	Color.Red,
+// 	Color.Rose,
+// 	Color.White,
+// 	Color.Yellow
+// ]
+
+// let numCor = corBolinha.length
 
 // 5 - criar movimentação bolinha
 
@@ -148,28 +163,35 @@ const txtpontos = new Label({
 
 game.add(txtpontos)
 
+const som = new Sound("./src/sound/Win.mp3")
+const som2 = new Sound("./src/sound/gameover.mp3")
+const som3 = new Sound("./src/sound/audio.mp3")
+const loader = new Loader([som, som2, som3])
+
 let colidindo: boolean = false
 
 const audio = new Audio('audio.mp3')
-const audio3 = new Audio('Win.mp3')
 
 bolinha.on("collisionstart", (event) => {
 	if (listaBlocos.includes(event.other)){
 		event.other.kill()
 
+		som3.play()
+
 		pontos++
 
-		if (pontos == 15){
+		bolinha.color = event.other.color
 
-			audio3.play()
+		// bolinha.color = corBolinha[ Math.trunc(Math.random() * numCor) ]
+
+		txtpontos.text = pontos.toString()
+
+		if (pontos == 15){
+			som.play()
 
 			alert("Você venceu!")
 			window.location.reload()
 		}
-
-		audio.play()
-		
-		txtpontos.text = pontos.toString()
 	}
 
 let intersec = event.contact.mtv.normalize()
@@ -194,7 +216,7 @@ bolinha.on("collisionend", () =>{
 const audio2 = new Audio('gameover.mp3')
 
 bolinha.on("exitviewport", () => {
-	audio2.play()
+	som2.play()
 
 	alert("E morreu")
 
@@ -204,4 +226,4 @@ bolinha.on("exitviewport", () => {
 
 
 // inicia o game
-game.start()
+await game.start(loader)
